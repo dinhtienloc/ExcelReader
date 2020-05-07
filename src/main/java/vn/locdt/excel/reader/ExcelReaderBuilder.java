@@ -1,7 +1,6 @@
 package vn.locdt.excel.reader;
 
 import org.apache.commons.lang3.Validate;
-import org.apache.commons.math3.util.Pair;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.util.CellReference;
@@ -111,17 +110,20 @@ public class ExcelReaderBuilder<E> {
      * Create a mapping between a list of references to an JPA Metamodel.
      * This method will use {@link DefaultCellDataConverter} as default converter.
      *
-     * @param references     list of reference
      * @param customTypeInfo if the mapped field has custom type,
-     *                       this param will describe the info of the custom type with field name and its type.
-     *                       The order of each field-type pair must be the same as the order of references.
+     *                       this param will describes the info of the custom type with reference, field name and its type.
      * @param fieldName      name of the mapped field
      * @param fieldDataType  expected data type of the mapped field
      * @param <T>            expected data type of the mapped field
      * @return this builder, to allow method chaining
      */
-    public <T> ExcelReaderBuilder<E> mapReference(List<String> references, List<Pair<String, Class<?>>> customTypeInfo, String fieldName, Class<T> fieldDataType) {
-        List<Class<?>> classes = customTypeInfo.stream().map(Pair::getValue).collect(Collectors.toList());
+    public <T> ExcelReaderBuilder<E> mapReference(List<ReferenceInfo> customTypeInfo, String fieldName, Class<T> fieldDataType) {
+        List<String> references = new ArrayList<>();
+        List<Class<?>> classes = new ArrayList<>();
+        customTypeInfo.forEach(i -> {
+            references.add(i.getRef());
+            classes.add(i.getType());
+        });
         return this.mapReference(references, classes, fieldName, new DefaultCellDataConverter<>(fieldDataType, customTypeInfo));
     }
 

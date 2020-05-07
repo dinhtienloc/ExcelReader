@@ -1,7 +1,7 @@
 package vn.locdt.excel.reader.converter;
 
-import org.apache.commons.math3.util.Pair;
 import org.apache.poi.ss.usermodel.Cell;
+import vn.locdt.excel.reader.ReferenceInfo;
 import vn.locdt.excel.reader.exception.CellConverterException;
 import vn.locdt.excel.reader.exception.InvalidDataException;
 import vn.locdt.excel.utils.ExcelUtils;
@@ -20,10 +20,10 @@ import java.util.List;
  * @param <E> result data type
  */
 public class DefaultCellDataConverter<E> implements CellDataConverter<E> {
-    private List<Pair<String, Class<?>>> nestedAttributes;
+    private List<ReferenceInfo> nestedAttributes;
     private Class<E> clazz;
 
-    public DefaultCellDataConverter(Class<E> clazz, List<Pair<String, Class<?>>> nestedAttributes) {
+    public DefaultCellDataConverter(Class<E> clazz, List<ReferenceInfo> nestedAttributes) {
         this.clazz = clazz;
         this.nestedAttributes = nestedAttributes;
     }
@@ -71,9 +71,9 @@ public class DefaultCellDataConverter<E> implements CellDataConverter<E> {
         E obj = ReflectionUtils.newInstanceFromClass(this.clazz);
 
         for (int i = 0; i < cells.length; i++) {
-            Class<?> expectedType = this.nestedAttributes.get(i).getValue();
+            Class<?> expectedType = this.nestedAttributes.get(i).getType();
             Object value = ExcelUtils.getCellValue(cells[i], expectedType);
-            ReflectionUtils.invokeSetMethod(obj, this.nestedAttributes.get(i).getKey(), value);
+            ReflectionUtils.invokeSetMethod(obj, this.nestedAttributes.get(i).getName(), value);
         }
 
         return obj;
