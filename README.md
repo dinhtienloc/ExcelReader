@@ -10,7 +10,7 @@ There are several important points about the usage of builder:
 - map multiple cells
 - converter
 
-##### 1. Common Builder's Method:
+#### 1. Common Builder's Method:
 First of all, there are a few simple things that you have to define while creating the builder.
 
 - `mapto(Class clazz)`: define class used to map the data
@@ -18,7 +18,7 @@ First of all, there are a few simple things that you have to define while creati
 - `sheet(Sheet sheet)`: define Sheet instance
 - `sheet(int sheetNum)` or `sheet(Sheet sheet)`: define Sheet instance
 
-##### 2. Map rows to object
+#### 2. Map rows to object
 You can use column index in excel file to help the reader stores column position it should use.
 And after that, you will use `readRow` method to tell reader which rows you want to map. (both column and row index are 0-based)
 
@@ -41,7 +41,7 @@ Example:
     Person p = createNewPerson();
     reader.readRow(p, rowIdx);
 
-##### 3. Map individual cells to object
+#### 3. Map individual cells to object
 `ExcelReader` provides another way to map the object in case the data in excel file is in mutiple, non-related cells.
 
     ExcelReader<Person> reader = ExcelReaderBuilder.mapTo(Person.class)...
@@ -58,7 +58,7 @@ By using this way, you just need to call `readRow()` to get your object.
     Person p = createNewPerson();
     reader.readRow(p);
     
-##### 4. Map custom type
+#### 4. Map custom type
 This library also provides methods to map multiple cells into one data type. For example, `Person` class is defined like this:
 
     class Person {
@@ -83,7 +83,7 @@ Then you can define the builder:
         
     Person p = reader.readRow();
 
-##### 5. Converter
+#### 5. Converter
 By default, all `mapReference` methods are using `DefaultCellDataConverter`. If the default converter is not your expectation, 
 you can create a custom converter which implements `CellDataConverter` interface. 
 You can use it as the final parameter in your `mapReference` method. 
