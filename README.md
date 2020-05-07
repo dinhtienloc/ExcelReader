@@ -42,7 +42,7 @@ Example:
     reader.readRow(p, rowIdx);
 
 ### 3. Map individual cells to object
-`ExcelReader` provides another way to map the object in case the data in excel file is in mutiple, non-related cells.
+`ExcelReader` provides another way to map the object in case the data in excel file is in many non-related cells.
 
     ExcelReader<Person> reader = ExcelReaderBuilder.mapTo(Person.class)...
         .mapReference("A1", "seqNo", Integer.class)
