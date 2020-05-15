@@ -7,7 +7,6 @@ import org.apache.poi.ss.util.CellReference;
 import vn.locdt.excel.reader.converter.CellDataConverter;
 import vn.locdt.excel.reader.exception.CellConverterException;
 import vn.locdt.excel.reader.exception.ExcelMappingException;
-import vn.locdt.excel.reader.exception.InvalidDataException;
 import vn.locdt.excel.utils.ReflectionUtils;
 
 import java.lang.reflect.Field;
@@ -23,7 +22,6 @@ import java.util.Map;
 public class ExcelReader<E> {
     private Class<E> clazz;
     private Map<String, Field> mapOfNameAndFields;
-    private Field pkField;
     private Sheet sheet;
     private List<FieldInfo<?>> fieldInfos;
 
@@ -39,10 +37,10 @@ public class ExcelReader<E> {
      *
      * @param rowNum row number need to map
      * @return mapped entity
-     * @throws InvalidDataException   throws if reading cell's value process has errors
+     * @throws ExcelMappingException  throws if reading cell's value process has errors
      * @throws CellConverterException throw after reading cell process, if converting process has errors
      */
-    public E readRow(int rowNum) throws InvalidDataException, CellConverterException {
+    public E readRow(int rowNum) throws CellConverterException {
         if (!this.isColumnReference()) {
             throw new ExcelMappingException("Mapping entity with row requires column reference");
         }
@@ -56,10 +54,10 @@ public class ExcelReader<E> {
      * @param fromRow start row to map
      * @param toRow   end row to map
      * @return list of mapped entities
-     * @throws InvalidDataException   throws if reading cell's value process has errors
+     * @throws ExcelMappingException  throws if reading cell's value process has errors
      * @throws CellConverterException throw after reading cell process, if converting process has errors
      */
-    public List<E> readRow(int fromRow, int toRow) throws InvalidDataException, CellConverterException {
+    public List<E> readRow(int fromRow, int toRow) throws CellConverterException {
         List<E> entities = new ArrayList<>();
         if (!this.isColumnReference()) {
             throw new ExcelMappingException("Mapping entity with row requires column reference");
@@ -75,10 +73,10 @@ public class ExcelReader<E> {
      * Map cells directly to a new entity by using references declared in reader.
      *
      * @return mapped entity
-     * @throws InvalidDataException   throws if reading cell's value process has errors
+     * @throws ExcelMappingException  throws if reading cell's value process has errors
      * @throws CellConverterException throw after reading cell process, if converting process has errors
      */
-    public E read() throws InvalidDataException, CellConverterException {
+    public E read() throws CellConverterException {
         if (this.isColumnReference()) {
             throw new ExcelMappingException("Mapping entity using cells requires cell reference");
         }
@@ -90,10 +88,10 @@ public class ExcelReader<E> {
      * Map cells directly to the existed entity by using references declared in reader.
      *
      * @param entity the entity instance need to mapped
-     * @throws InvalidDataException   throws if reading cell's value process has errors
+     * @throws ExcelMappingException  throws if reading cell's value process has errors
      * @throws CellConverterException throw after reading cell process, if converting process has errors
      */
-    public void read(E entity) throws InvalidDataException, CellConverterException {
+    public void read(E entity) throws CellConverterException {
         if (this.isColumnReference()) {
             throw new ExcelMappingException("Mapping entity using cells requires cell reference");
         }
@@ -110,10 +108,10 @@ public class ExcelReader<E> {
      * @param entity entity instance
      * @param rowNum row number
      * @return mapped entity instance
-     * @throws InvalidDataException   throws if reading cell's value process has errors
+     * @throws ExcelMappingException  throws if reading cell's value process has errors
      * @throws CellConverterException throw after reading cell process, if converting process has errors
      */
-    public E readRow(E entity, Integer rowNum) throws InvalidDataException, CellConverterException {
+    public E readRow(E entity, Integer rowNum) throws CellConverterException {
         E newEntity = entity != null ? entity : ReflectionUtils.newInstanceFromClass(this.clazz);
         for (FieldInfo<?> info : this.fieldInfos) {
             this.mapCellValue(newEntity, info, rowNum);
@@ -139,10 +137,10 @@ public class ExcelReader<E> {
      *
      * @param entity    result entity
      * @param fieldInfo object holds the mapping information
-     * @throws InvalidDataException   throws if reading cell's value process has errors
+     * @throws ExcelMappingException  throws if reading cell's value process has errors
      * @throws CellConverterException throw after reading cell process, if converting process has errors
      */
-    private void mapCellValue(E entity, FieldInfo<?> fieldInfo, Integer rowNum) throws InvalidDataException, CellConverterException {
+    private void mapCellValue(E entity, FieldInfo<?> fieldInfo, Integer rowNum) throws CellConverterException {
         final String fieldName = fieldInfo.getFieldName();
 
         // find the field
@@ -162,10 +160,10 @@ public class ExcelReader<E> {
     }
 
     // Convert one or many cells to an object of a field of mapped entity based on mapping information
-    private Object convertCellsToFieldValue(FieldInfo<?> fieldInfo, Integer rowNum) throws CellConverterException, InvalidDataException {
+    private Object convertCellsToFieldValue(FieldInfo<?> fieldInfo, Integer rowNum) throws CellConverterException {
         if (fieldInfo.getReferences().size() != fieldInfo.getReferenceTypes().size()) {
             String mes = "Can not convert to field '%s.%s': Number of references is not equal to the number of declared attributes";
-            throw new InvalidDataException(String.format(mes, fieldInfo.getConverter().getConvertedType(), fieldInfo.getFieldName()));
+            throw new ExcelMappingException(String.format(mes, fieldInfo.getConverter().getConvertedType(), fieldInfo.getFieldName()));
         }
 
         List<Cell> cells = new ArrayList<>();

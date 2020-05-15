@@ -9,14 +9,15 @@ There are several important points about the usage of builder:
 - map individual cell
 - map multiple cells
 - converter
+- exception
 
 ### 1. Common Builder's Method:
 First of all, there are a few simple things that you have to define while creating the builder.
 
 - `mapto(Class clazz)`: define class used to map the data
 - `wb(Workbook wb)`: define Workbook instance
-- `sheet(Sheet sheet)`: define Sheet instance
-- `sheet(int sheetNum)` or `sheet(Sheet sheet)`: define Sheet instance
+- `sheet(int sheetNum)`: define Sheet instance
+- `sheet(Sheet sheet)`: define Sheet instance and override Workbook instance of Builder by `sheet.getWorkbook()`
 
 ### 2. Map rows to object
 You can use column index in excel file to help the reader stores column position it should use.
@@ -87,3 +88,11 @@ Then you can define the builder:
 By default, all `mapReference` methods are using `DefaultCellDataConverter`. If the default converter doesn't meet your expectation, 
 you can create a custom converter which implements `CellDataConverter` interface. 
 You can use it as the final parameter in your `mapReference` method. 
+
+### 6. Exception
+There are 2 exceptions can be thrown:
+
+- `ExcelMappingException`: unchecked exception, will be thrown when there are errors of mapping between fields and cells.
+Eg: map to invalid cell, or number of cells is different from number of fields,...
+- `CellConverterException`: will be thrown if the mapping is correct, system can extract cell's value
+but can not convert to the expected type

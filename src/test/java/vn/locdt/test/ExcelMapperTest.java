@@ -8,6 +8,7 @@ import org.junit.Test;
 import vn.locdt.excel.reader.ExcelReader;
 import vn.locdt.excel.reader.ExcelReaderBuilder;
 import vn.locdt.excel.reader.ReferenceInfo;
+import vn.locdt.excel.reader.exception.CellConverterException;
 
 import java.io.File;
 import java.io.IOException;
@@ -18,11 +19,11 @@ public class ExcelMapperTest {
 
     @Before
     public void setup() throws IOException {
-       wb = WorkbookFactory.create(new File("src/test/java/SampleExcel.xlsx"));
+        wb = WorkbookFactory.create(new File("src/test/java/SampleExcel.xlsx"));
     }
 
     @Test
-    public void testReadExcelFileUsingColumnNoMapping() {
+    public void testReadExcelFileUsingColumnNoMapping() throws CellConverterException {
         ExcelReader<Data> reader = ExcelReaderBuilder.mapTo(Data.class)
                 .wb(wb)
                 .mapReference(1, "seqNo", Integer.class)
@@ -42,7 +43,7 @@ public class ExcelMapperTest {
     }
 
     @Test
-    public void testReadExcelFileUsingReferenceMapping() {
+    public void testReadExcelFileUsingReferenceMapping() throws CellConverterException {
         ExcelReader<Data> reader = ExcelReaderBuilder.mapTo(Data.class)
                 .wb(wb)
                 .mapReference("B7", "seqNo", Integer.class)
@@ -67,7 +68,12 @@ public class ExcelMapperTest {
                 ), "data", CompositeData.Data.class)
                 .build();
 
-        CompositeData compositeData = reader.read();
+        CompositeData compositeData = null;
+        try {
+            compositeData = reader.read();
+        } catch (CellConverterException e) {
+            e.printStackTrace();
+        }
         Assert.assertEquals(compositeData.getSeqNo(), new Integer(1));
         Assert.assertEquals(compositeData.getData().getQty(), new Double(1.3));
         Assert.assertEquals(compositeData.getData().getName(), "Heisenberg");
